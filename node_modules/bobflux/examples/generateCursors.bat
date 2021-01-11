@@ -1,0 +1,1 @@
+bfg c --appStatePath src/states.ts --appStateName IApplicationState --recursively 1

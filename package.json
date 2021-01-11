@@ -1,0 +1,26 @@
+{
+  "name": "bobril-application",
+  "version": "1.0.0",
+  "description": "Testing application",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ales Matejka",
+  "license": "ISC",
+  "dependencies": {
+    "bobril": "^14.18.0",
+    "bobwai--app-header": "^4.0.4",
+    "bobwai--avatar": "^2.1.0",
+    "bobwai--chat": "^9.1.2",
+    "bobwai--composition--application-views": "^2.0.9",
+    "bobwai--empty-state": "^2.1.0",
+    "bobwai--example": "^3.13.0",
+    "bobwai--filter": "^6.6.0",
+    "bobwai--footer": "^2.1.4",
+    "bobwai--icon": "^17.25.0",
+    "bobwai--sidebar": "^2.0.9",
+    "bobwai--viewer-container": "^4.6.2",
+    "bobx": "^0.29.0"
+  }
+}
