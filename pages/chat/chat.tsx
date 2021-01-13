@@ -1,8 +1,8 @@
 import * as b from "bobril";
-import * as h from "bobwai--chat/examples/src/helpers";
 import {chatStore} from "../store/chatStore";
 import { Chat, IComment } from "bobwai--chat/src/lib";
 import {userStore} from "../store/userStore";
+import * as chat from "bobwai--chat/src/lib";
 
 const defaultRootCommentId = chatStore.defaultRootCommentId;
 
@@ -15,19 +15,51 @@ function dateNow(): string {
     return utc;
 }
 
+function icon(id) {
+    let result;
+    result = userStore.users.find(user => {
+        return user.id === id
+    });
+    return result.avatar
+}
+
+function findUser(id: number) {
+    return userStore.users.find(user => {
+        return user.id === id
+    });
+}
+
 export const ChatPage = b.createVirtualComponent({
     id: "chat",
     render(ctx: b.IBobrilCtx, me: b.IBobrilNode) {
-        let model: IComment<number>[] = [];
 
-        chatStore.model.forEach(comment => {
-            var userName = "";
-            userStore.users.forEach(user => {
-                if (user.id.toString() === ctx.data.routeParams["userId"])
-                    userName = user.name;
-            })
-            if(comment.userName === userName || comment.userName === "John Mitchel") {
-                model.push(comment);
+        let model: IComment<number>[] = [];
+        let loggedInUser = findUser(5);
+        let otherUser = findUser(parseInt(ctx.data.routeParams["userId"]));
+
+        chatStore.comment.forEach(comment => {
+
+            if(comment.to === otherUser.id && comment.from === loggedInUser.id) {
+                model.push({
+                    id: comment.id,
+                    text: comment.text,
+                    userName: loggedInUser.name,
+                    isEditable: comment.isEditable,
+                    created: comment.created,
+                    icon: loggedInUser.avatar,
+                    replies: comment.replies
+                })
+            }
+            if(comment.to === loggedInUser.id && comment.from === otherUser.id) {
+                model.push({
+                    id: comment.id,
+                    text: comment.text,
+                    userName: otherUser.name,
+                    isEditable: comment.isEditable,
+                    created: comment.created,
+                    icon: otherUser.avatar,
+                    replies: comment.replies
+                })
             }
         })
 
@@ -52,20 +84,21 @@ export const ChatPage = b.createVirtualComponent({
                             chatStore.addComment({
                                 id: lastId1++,
                                 text: text,
-                                userName: "John Mitchel",
+                                from: 5,
+                                to: otherUser.id,
                                 isEditable: true,
                                 created: dateNow(),
                                 replies: []
                             })
                         } else {
-                            chatStore.model
+                            chatStore.comment
                                 .filter(c => c.id === parentCommentId)[0]
                                 .replies.push({
                                 id: lastId1++,
                                 text: text,
-                                userName: "John Mitchel",
+                                userName: loggedInUser.name,
+                                icon: loggedInUser.avatar,
                                 isEditable: true,
-                                icon: h.iconJdReply,
                                 created: dateNow(),
                                 replies: []
                             });
@@ -74,9 +107,9 @@ export const ChatPage = b.createVirtualComponent({
                     }}
                     onEditComment={(commentId, value, parentId) => {
                         if (parentId !== undefined) {
-                            chatStore.model.filter(c => c.id === parentId)[0].replies.slice(-1)[0].text = value;
+                            chatStore.comment.filter(c => c.id === parentId)[0].replies.slice(-1)[0].text = value;
                         } else {
-                            chatStore.model.filter(c => c.id === commentId)[0].text = value;
+                            chatStore.comment.filter(c => c.id === commentId)[0].text = value;
                         }
 
                         commentValue = "";
@@ -94,7 +127,7 @@ export const ChatPage = b.createVirtualComponent({
                                 }
                             }
                         } else {
-                            let index = chatStore.model.findIndex(comment => {
+                            let index = chatStore.comment.findIndex(comment => {
                                 if(comment.id === commentId)
                                     return index = comment.id;
                             })
@@ -108,7 +141,7 @@ export const ChatPage = b.createVirtualComponent({
                         activeCommentId = -1;
                         b.invalidate();
                     }}
-                    icon={h.iconMdComment}
+                    icon={icon(5)}
                     headerOff
                     placeholderText={"Type a message"}
                 />

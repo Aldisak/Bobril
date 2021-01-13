@@ -10,7 +10,7 @@ import {create as LMainView} from "bobwai--l-view-main/src/lib";
 import {create as AppHeader} from "bobwai--app-header";
 import { userStore } from "./store/userStore";
 
-let value = "";
+let filterValue = "[^]*";
 
 const sideBarHeaderStyle = b.styleDef({
     paddingLeft:"8px",
@@ -26,19 +26,13 @@ const selectUser = (id: number): boolean => {
     return true;
 };
 
-var sidebarItems: SidebarItem.IData[] = [];
-
-userStore.users.forEach(user => sidebarItems.push({
-    id: user.id.toString(),
-    title: user.name,
-    onClick: () => selectUser(user.id)
-}))
-
 function setActiveItem(source: SidebarItem.IData[], id: string): void {
     source.forEach((item: SidebarItem.IData) => {
         item.isActive = item.id === id;
     });
 }
+
+var sidebarItems: SidebarItem.IData[] = [];
 
 function text(text: string, fontWeight: string | number, fontSize: string, isItalic: boolean = false, fontFamily?: string) {
     return (
@@ -56,14 +50,15 @@ function sideBarHeader() {
         <div style={sideBarHeaderStyle}>
             <Avatar size={140} imageSrc="https://www.w3schools.com/html/img_girl.jpg" />
             <span style={{paddingLeft:"16px"}}>
-                    {text("John Mitchel", 600,"19px", false)}
-                </span>
+                {text("John Mitchel", 600,"19px", false)}
+            </span>
             <div style={{marginTop:"8px"}}>
                 <Filter placeholder={"Search"} onChange={(v) => {
-                    value = v;
+                    filterValue = v;
+                    console.log(filterValue);
                     b.invalidate();
                 }} onTextClear={() => {
-                    value = "";
+                    filterValue = "[^]*";
                     b.invalidate();
                 }} />
             </div>
@@ -86,6 +81,18 @@ function appBarLeftContent(userName) {
 export const Main = b.createVirtualComponent({
     id: "main",
     render(ctx: b.IBobrilCtx, me: b.IBobrilNode) {
+        sidebarItems = [];
+        var regexp = new RegExp("^" + filterValue, 'i');
+
+        userStore.users.forEach(user => {
+            if(user.id !== 5 && regexp.test(user.name)) {
+                sidebarItems.push({
+                    id: user.id.toString(),
+                    title: user.name,
+                    onClick: () => selectUser(user.id)
+                })
+            }
+        })
 
         var userName;
         userStore.users.forEach(user => {

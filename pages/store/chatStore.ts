@@ -1,84 +1,104 @@
 import { observable, computed } from "bobx";
-import { IComments } from "../chat/comments";
-// import * as h from "bobwai--chat/examples/src/helpers";
-import * as chat from "bobwai--chat/src/lib";
-import * as b from "bobril";
-import * as Icon from "bobwai--icon/src/lib";
-import * as color from "bobwai--color/src/lib";
 import * as h from "bobwai--chat/examples/src/helpers";
 
-export const iconRdComment = b.styledDiv(null, b.sprite(Icon.user_medium_png, color.Warning));
-export const iconRdReply = b.styledDiv(null, b.sprite(Icon.user_small_24_png, color.Warning));
-export const iconJdComment = b.styledDiv(null, b.sprite(Icon.user_medium_png, color.Error));
-export const iconJdReply = b.styledDiv(null, b.sprite(Icon.user_small_24_png, color.Error));
-export const iconMdComment = b.styledDiv(null, b.sprite(Icon.user_medium_png, color.Application));
-export const iconMdReply = b.styledDiv(null, b.sprite(Icon.user_small_24_png, color.Application));
-export const iconAnonymousComment = b.styledDiv(null, b.sprite(Icon.user_medium_png, color.White));
-export const iconAnonymousReply = b.styledDiv(null, b.sprite(Icon.user_small_24_png, color.White));
-
-
+interface Comment {
+    id: number,
+    text: string,
+    created: string,
+    from?: number,
+    to?: number,
+    isEditable?: boolean,
+    replies: any
+}
 
 export class ChatStore {
-    @observable model: chat.IComment<number>[] = [
+    comment: Comment[] = [
         {
             id: 0,
-            text: "This is comment from Hans Becker.",
-            userName: "Hans Becker",
+            text: "Are you here?",
             created: "2020.01.30",
-            icon: iconJdComment,
-            replies: []
-        },
-        {
-            id: 1,
-            text: "This is comment from Hans Becker.",
-            userName: "Hans Becker",
-            created: "2020.02.14",
-            icon: iconJdComment,
+            from: 1,
+            to: 5,
             replies: []
         },
         {
             id: 2,
-            text: "This is comment. Thomas Wood has his own icon.",
-            userName: "Thomas Wood",
-            created: "2021.02.15",
-            icon: iconAnonymousComment,
+            text: "Yes, I am.",
+            isEditable: true,
+            from: 5,
+            to: 1,
+            created: "2020.02.08",
             replies: []
         },
         {
             id: 3,
-            text: "This is comment. Alen Green has his own icon.",
-            userName: "Alen Green",
-            created: "2020.02.28",
-            icon: iconMdComment,
+            text: "Okay.",
+            created: "2020.02.14",
+            from: 1,
+            to: 5,
             replies: []
         },
         {
             id: 4,
-            text: "This is comment. Alen Green has his own icon.",
-            userName: "Alen Green",
-            created: "2020.04.10",
-            icon: iconMdComment,
+            text: "I would like to remind you your meeting on Saturady.",
+            created: "2021.02.15",
+            from: 2,
+            to: 5,
             replies: []
         },
         {
             id: 5,
-            text: "This is comment. Phil Barret has his own icon.",
-            userName: "Phil Barret",
-            created: "2020.06.31",
-            icon: iconRdComment,
+            text: "Hello.",
+            created: "2020.02.28",
+            from: 3,
+            to: 5,
             replies: []
         },
         {
             id: 6,
-            text: "This is comment. Phil Barret has his own icon.",
-            userName: "Phil Barret",
-            created: "2020.10.01",
-            icon: iconRdComment,
+            text: "How are you John?",
+            created: "2020.04.10",
+            from: 3,
+            to: 5,
+            replies: []
+        },
+        {
+            id: 7,
+            text: "Hello, are you here?",
+            created: "2020.06.31",
+            from: 4,
+            to: 5,
+            replies: []
+        },
+        {
+            id: 8,
+            text: "Apparently you aren't.",
+            created: "2020.07.01",
+            from: 4,
+            to: 5,
+            replies: []
+        },
+        {
+            id: 9,
+            text: "I will be there, thank you.",
+            isEditable: true,
+            from: 5,
+            to: 2,
+            created: "2020.02.16",
+            replies: []
+        },
+        {
+            id: 10,
+            text: "Hello, I am fine. What about you?",
+            isEditable: true,
+            from: 5,
+            to: 3,
+            created: "2020.02.16",
             replies: []
         }
     ];
 
-    @observable lastId1: number = this.model.length;
+    @observable lastId1: number = this.comment.length;
     @observable commentValue: string = "";
     @observable defaultRootCommentId: number = -1;
     @observable activeCommentId: number = -1;
@@ -89,31 +109,20 @@ export class ChatStore {
     }
 
     addComment(comment) {
-        this.model.push({
+        this.comment.push({
             id: comment.id,
             text: comment.text,
-            userName: comment.userName,
-            isEditable: true,
-            icon: h.iconJdReply,
+            from: comment.from,
+            to: comment.to,
+            isEditable: comment.isEditable,
             created: comment.created,
             replies: comment.replies
         });
-        console.log("Element has been added by a store");
-    }
-
-    editComment(lastCommentId, newComment) {
-        console.log(lastCommentId, newComment);
-
-
-        /*this.model.push({
-            id: editCommentValue.id,
-            text: editCommentValue.text
-        });*/
-        console.log("Element has been edited by a store");
+        console.log(comment);
     }
 
     removeComment(index: number) {
-        this.model.splice(index, 1);
+        this.comment.splice(index, 1);
     }
 }
 
