@@ -1,33 +1,14 @@
 import * as b from "bobril";
 import {chatStore} from "../store/chatStore";
 import { Chat, IComment } from "bobwai--chat/src/lib";
-import {userStore} from "../store/userStore";
 import * as chat from "bobwai--chat/src/lib";
+import { findUser, dateNow, generateId, icon } from "../utils";
+import { chatStyle } from "../styles";
 
 const defaultRootCommentId = chatStore.defaultRootCommentId;
-
 let lastId1 = chatStore.lastId1;
 let activeCommentId = chatStore.activeCommentId;
 let commentValue = chatStore.commentValue;
-
-function dateNow(): string {
-    var utc = new Date().toJSON().slice(0,10).replace(/-/g,'.');
-    return utc;
-}
-
-function icon(id) {
-    let result;
-    result = userStore.users.find(user => {
-        return user.id === id
-    });
-    return result.avatar
-}
-
-function findUser(id: number) {
-    return userStore.users.find(user => {
-        return user.id === id
-    });
-}
 
 export const ChatPage = b.createVirtualComponent({
     id: "chat",
@@ -38,7 +19,6 @@ export const ChatPage = b.createVirtualComponent({
         let otherUser = findUser(parseInt(ctx.data.routeParams["userId"]));
 
         chatStore.comment.forEach(comment => {
-
             if(comment.to === otherUser.id && comment.from === loggedInUser.id) {
                 model.push({
                     id: comment.id,
@@ -64,40 +44,53 @@ export const ChatPage = b.createVirtualComponent({
         })
 
         me.children = (
-            <div style={{marginTop: "32px"}}>
+            <div style={chatStyle}>
                 <Chat
-                    labels={{submit: "Submit", reply: "Reply", label: "", cancel: "Cancel",
-                        edit: "Edit", removeComment: "Delete"}}
-                    blurSave
-                    comments={model}
+                    labels={{
+                        submit: "Submit",
+                        reply: "Reply",
+                        label: "Social Commenting",
+                        cancel: "Cancel",
+                        edit: "Edit",
+                        removeComment: "Delete",
+                        newComment: "New Comment"
+                    }}
+                    headerOff
                     activeCommentId={activeCommentId}
-                    defaultRootCommentId={defaultRootCommentId}
                     activeCommentValue={commentValue}
+                    defaultRootCommentId={defaultRootCommentId}
+                    comments={model}
+                    icon={icon(5)}
+                    onChangeActiveCommentId={(id) => {
+                        activeCommentId = id;
+                        b.invalidate();
+                    }}
                     onChangeActiveCommentValue={(text: string) => {
                         commentValue = text;
                         b.invalidate();
                     }}
-                    onChangeActiveCommentId={id => {activeCommentId = id; b.invalidate();}}
                     onActiveCommentSubmit={(parentCommentId, text: string) => {
-                        if(text === "") return;
-                        if (parentCommentId === defaultRootCommentId) {
-                            chatStore.addComment({
-                                id: lastId1++,
-                                text: text,
-                                from: 5,
-                                to: otherUser.id,
-                                isEditable: true,
-                                created: dateNow(),
-                                replies: []
-                            })
-                        } else {
+                        if (parentCommentId !== defaultRootCommentId) {
+                            model.forEach(c => (c.isScrolledTo = false));
                             chatStore.comment
                                 .filter(c => c.id === parentCommentId)[0]
                                 .replies.push({
+                                id: generateId(),
+                                text: text,
+                                from: findUser(5).id,
+                                userName: findUser(5).name,
+                                isEditable: true,
+                                icon: findUser(5).avatar,
+                                created: dateNow(),
+                                replies: []
+                            });
+                        } else {
+                            model.forEach(c => (c.isScrolledTo = false));
+                            chatStore.comment.push({
                                 id: lastId1++,
                                 text: text,
-                                userName: loggedInUser.name,
-                                icon: loggedInUser.avatar,
+                                from: findUser(5).id,
+                                to: otherUser.id,
                                 isEditable: true,
                                 created: dateNow(),
                                 replies: []
@@ -105,21 +98,17 @@ export const ChatPage = b.createVirtualComponent({
                         }
                         b.invalidate();
                     }}
-                    onEditComment={(commentId, value, parentId) => {
-                        if (parentId !== undefined) {
+                    onEditComment={(commentId, value: string, parentId) => {
+                        if (parentId) {
                             chatStore.comment.filter(c => c.id === parentId)[0].replies.slice(-1)[0].text = value;
                         } else {
                             chatStore.comment.filter(c => c.id === commentId)[0].text = value;
                         }
 
-                        commentValue = "";
-                        activeCommentId = -1;
+                        activeCommentId = -2;
                         b.invalidate();
                     }}
-                    onEditFocusOutComment={commentId => {
-                        console.log("onEditFocusOutComment", commentId);
-                    }}
-                    onDeleteComment={(commentId) => {
+                    onDeleteComment={commentId => {
                         if (!model.filter(c => c.id === commentId)[0]) {
                             for (let i = 0; i < model.length; i++) {
                                 if (model[i] && model[i].replies.filter(c => c.id === commentId)[0]) {
@@ -138,13 +127,9 @@ export const ChatPage = b.createVirtualComponent({
                         b.invalidate();
                     }}
                     onCancelComment={() => {
-                        activeCommentId = -1;
+                        activeCommentId = -2;
                         b.invalidate();
-                    }}
-                    icon={icon(5)}
-                    headerOff
-                    placeholderText={"Type a message"}
-                />
+                    }} />
             </div>
         );
     }

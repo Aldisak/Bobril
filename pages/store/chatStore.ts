@@ -8,22 +8,23 @@ interface Comment {
     from?: number,
     to?: number,
     isEditable?: boolean,
-    replies: any
+    replies?: any
 }
 
 export class ChatStore {
     comment: Comment[] = [
         {
-            id: 0,
-            text: "Are you here?",
-            created: "2020.01.30",
+            id: 1,
+            text: "Hey man, don't ignore me!",
+            created: "2020.01.31",
+            isEditable: false,
             from: 1,
             to: 5,
             replies: []
         },
         {
             id: 2,
-            text: "Yes, I am.",
+            text: "Hello, sorry I was unavailable.",
             isEditable: true,
             from: 5,
             to: 1,
@@ -34,6 +35,7 @@ export class ChatStore {
             id: 3,
             text: "Okay.",
             created: "2020.02.14",
+            isEditable: false,
             from: 1,
             to: 5,
             replies: []
@@ -42,6 +44,7 @@ export class ChatStore {
             id: 4,
             text: "I would like to remind you your meeting on Saturady.",
             created: "2021.02.15",
+            isEditable: false,
             from: 2,
             to: 5,
             replies: []
@@ -50,6 +53,7 @@ export class ChatStore {
             id: 5,
             text: "Hello.",
             created: "2020.02.28",
+            isEditable: false,
             from: 3,
             to: 5,
             replies: []
@@ -58,6 +62,7 @@ export class ChatStore {
             id: 6,
             text: "How are you John?",
             created: "2020.04.10",
+            isEditable: false,
             from: 3,
             to: 5,
             replies: []
@@ -66,6 +71,7 @@ export class ChatStore {
             id: 7,
             text: "Hello, are you here?",
             created: "2020.06.31",
+            isEditable: false,
             from: 4,
             to: 5,
             replies: []
@@ -74,6 +80,7 @@ export class ChatStore {
             id: 8,
             text: "Apparently you aren't.",
             created: "2020.07.01",
+            isEditable: false,
             from: 4,
             to: 5,
             replies: []
@@ -93,12 +100,12 @@ export class ChatStore {
             isEditable: true,
             from: 5,
             to: 3,
-            created: "2020.02.16",
+            created: "2020.02.17",
             replies: []
         }
     ];
 
-    @observable lastId1: number = this.comment.length;
+    @observable lastId1: number = 11;
     @observable commentValue: string = "";
     @observable defaultRootCommentId: number = -1;
     @observable activeCommentId: number = -1;
@@ -118,7 +125,7 @@ export class ChatStore {
             created: comment.created,
             replies: comment.replies
         });
-        console.log(comment);
+        console.log("storeAdd")
     }
 
     removeComment(index: number) {

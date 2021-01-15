@@ -14,11 +14,13 @@
     "bobwai--avatar": "^2.1.0",
     "bobwai--chat": "^9.1.2",
     "bobwai--composition--application-views": "^2.0.9",
+    "bobwai--composition--sidebar": "^2.0.6",
     "bobwai--empty-state": "^2.1.0",
     "bobwai--example": "^3.13.0",
     "bobwai--filter": "^6.6.0",
     "bobwai--footer": "^2.1.4",
     "bobwai--icon": "^17.25.0",
+    "bobwai--image": "^2.7.0",
     "bobwai--sidebar": "^2.0.9",
     "bobwai--viewer-container": "^4.6.2",
     "bobx": "^0.29.0"
